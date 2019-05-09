@@ -13,8 +13,9 @@ import java.security.spec.X509EncodedKeySpec;
 public class RSACipher {
     /**
      * 加密方法
+     *
      * @param publicKey 公钥
-     * @param raw 待加密明文
+     * @param raw       待加密明文
      * @return 加密后的密文
      * @throws Exception
      */
@@ -27,9 +28,10 @@ public class RSACipher {
     }
 
     /**
-     *解密方法
+     * 解密方法
+     *
      * @param privateKey 私钥
-     * @param enc 待解密密文
+     * @param enc        待解密密文
      * @return 解密后的明文
      * @throws Exception
      */
@@ -42,6 +44,7 @@ public class RSACipher {
 
     /**
      * 获取公钥
+     *
      * @param key 密钥字符串（经过base64编码）
      * @return 公钥
      * @throws Exception
@@ -55,6 +58,7 @@ public class RSACipher {
 
     /**
      * 获取私钥
+     *
      * @param key 密钥字符串（经过base64编码）
      * @return 私钥
      * @throws Exception
@@ -68,11 +72,12 @@ public class RSACipher {
 
     /**
      * 签名
-     * @param content 要进行签名的内容
+     *
      * @param privateKey 私钥
+     * @param content    要进行签名的内容
      * @return 签名
      */
-    public static String sign(byte[] content, String privateKey) {
+    public static String sign(String privateKey, byte[] content) {
         try {
             PKCS8EncodedKeySpec priPKCS8 = new PKCS8EncodedKeySpec(Base64.decodeBase64(privateKey.getBytes()));
             KeyFactory keyf = KeyFactory.getInstance("RSA");
@@ -90,12 +95,13 @@ public class RSACipher {
 
     /**
      * 验签
-     * @param content 要验签的内容
-     * @param sign 签名
+     *
      * @param publicKey 公钥
+     * @param content   要验签的内容
+     * @param sign      签名
      * @return 验签结果
      */
-    public static boolean checkSign(byte[] content, String sign, String publicKey) {
+    public static boolean checkSign(String publicKey, byte[] content, String sign) {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             byte[] encodedKey = Base64.decode2(publicKey);
@@ -108,5 +114,24 @@ public class RSACipher {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static void main(String[] args) throws Exception {
+        //客户端代码
+        String text = "hello";
+        //使用服务端公钥加密
+        byte[] encryptText = RSACipher.encrypt(Config.SERVER_PUBLIC_KEY, text.getBytes());
+        System.out.println("加密后:\n" + new String(encryptText));
+        //使用客户端私钥签名
+        String signature = RSACipher.sign(Config.CLIENT_PRIVATE_KEY, encryptText);
+        System.out.println("签名:\n" + signature);
+
+        //服务端代码
+        //使用客户端公钥验签
+        boolean result = RSACipher.checkSign(Config.CLIENT_PUBLIC_KEY, encryptText, signature);
+        System.out.println("验签:\n" + result);
+        //使用服务端私钥解密
+        byte[] decryptText = RSACipher.decrypt(Config.SERVER_PRIVATE_KEY, encryptText);
+        System.out.println("解密后:\n" + new String(decryptText));
     }
 }

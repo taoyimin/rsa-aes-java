@@ -46,4 +46,15 @@ public class AESCipher {
         byte[] result = cipher.doFinal(decoder.decode(enc));
         return new String(result);
     }
+
+    public static void main(String[] args) throws Exception {
+        //客户端代码
+        String text = "hello";
+        //随机生成16位aes密钥
+        byte[] aesKey = SecureRandomUtil.getRandom(16).getBytes();
+        String encryptText = AESCipher.encrypt(aesKey, text);
+        System.out.println("加密后:\n" + encryptText);
+        String decryptText = AESCipher.decrypt(aesKey, encryptText);
+        System.out.println("解密后:\n" + decryptText);
+    }
 }
