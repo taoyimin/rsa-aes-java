@@ -1,4 +1,6 @@
 import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class Base64 {
     /**
@@ -113,7 +115,7 @@ public class Base64 {
      *
      * @param arrayOctect byte array to test
      * @return true if all bytes are valid characters in the Base64
-     *         alphabet or if the byte array is empty; false, otherwise
+     * alphabet or if the byte array is empty; false, otherwise
      */
     public static boolean isArrayByteBase64(byte[] arrayOctect) {
 
@@ -171,8 +173,8 @@ public class Base64 {
      * chunking the output into 76 character blocks.
      *
      * @param binaryData Array containing binary data to encode.
-     * @param isChunked if isChunked is true this encoder will chunk
-     *                  the base64 output into 76 character blocks
+     * @param isChunked  if isChunked is true this encoder will chunk
+     *                   the base64 output into 76 character blocks
      * @return Base64-encoded data.
      */
     public static byte[] encodeBase64(byte[] binaryData, boolean isChunked) {
@@ -197,7 +199,7 @@ public class Base64 {
         if (isChunked) {
 
             nbrChunks =
-                (CHUNK_SEPARATOR.length == 0 ? 0 : (int) Math.ceil((float) encodedDataLength / CHUNK_SIZE));
+                    (CHUNK_SEPARATOR.length == 0 ? 0 : (int) Math.ceil((float) encodedDataLength / CHUNK_SIZE));
             encodedDataLength += nbrChunks * CHUNK_SEPARATOR.length;
         }
 
@@ -224,20 +226,20 @@ public class Base64 {
             k = (byte) (b1 & 0x03);
 
             byte val1 =
-                ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
+                    ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
             byte val2 =
-                ((b2 & SIGN) == 0) ? (byte) (b2 >> 4) : (byte) ((b2) >> 4 ^ 0xf0);
+                    ((b2 & SIGN) == 0) ? (byte) (b2 >> 4) : (byte) ((b2) >> 4 ^ 0xf0);
             byte val3 =
-                ((b3 & SIGN) == 0) ? (byte) (b3 >> 6) : (byte) ((b3) >> 6 ^ 0xfc);
+                    ((b3 & SIGN) == 0) ? (byte) (b3 >> 6) : (byte) ((b3) >> 6 ^ 0xfc);
 
             encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
             //log.debug( "val2 = " + val2 );
             //log.debug( "k4   = " + (k<<4) );
             //log.debug(  "vak  = " + (val2 | (k<<4)) );
             encodedData[encodedIndex + 1] =
-                lookUpBase64Alphabet[val2 | (k << 4)];
+                    lookUpBase64Alphabet[val2 | (k << 4)];
             encodedData[encodedIndex + 2] =
-                lookUpBase64Alphabet[(l << 2) | val3];
+                    lookUpBase64Alphabet[(l << 2) | val3];
             encodedData[encodedIndex + 3] = lookUpBase64Alphabet[b3 & 0x3f];
 
             encodedIndex += 4;
@@ -247,15 +249,15 @@ public class Base64 {
                 // this assumes that CHUNK_SIZE % 4 == 0
                 if (encodedIndex == nextSeparatorIndex) {
                     System.arraycopy(
-                        CHUNK_SEPARATOR,
-                        0,
-                        encodedData,
-                        encodedIndex,
-                        CHUNK_SEPARATOR.length);
+                            CHUNK_SEPARATOR,
+                            0,
+                            encodedData,
+                            encodedIndex,
+                            CHUNK_SEPARATOR.length);
                     chunksSoFar++;
                     nextSeparatorIndex =
-                        (CHUNK_SIZE * (chunksSoFar + 1)) +
-                        (chunksSoFar * CHUNK_SEPARATOR.length);
+                            (CHUNK_SIZE * (chunksSoFar + 1)) +
+                                    (chunksSoFar * CHUNK_SEPARATOR.length);
                     encodedIndex += CHUNK_SEPARATOR.length;
                 }
             }
@@ -270,7 +272,7 @@ public class Base64 {
             //log.debug("b1=" + b1);
             //log.debug("b1<<2 = " + (b1>>2) );
             byte val1 =
-                ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
+                    ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
             encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
             encodedData[encodedIndex + 1] = lookUpBase64Alphabet[k << 4];
             encodedData[encodedIndex + 2] = PAD;
@@ -283,13 +285,13 @@ public class Base64 {
             k = (byte) (b1 & 0x03);
 
             byte val1 =
-                ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
+                    ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
             byte val2 =
-                ((b2 & SIGN) == 0) ? (byte) (b2 >> 4) : (byte) ((b2) >> 4 ^ 0xf0);
+                    ((b2 & SIGN) == 0) ? (byte) (b2 >> 4) : (byte) ((b2) >> 4 ^ 0xf0);
 
             encodedData[encodedIndex] = lookUpBase64Alphabet[val1];
             encodedData[encodedIndex + 1] =
-                lookUpBase64Alphabet[val2 | (k << 4)];
+                    lookUpBase64Alphabet[val2 | (k << 4)];
             encodedData[encodedIndex + 2] = lookUpBase64Alphabet[l << 2];
             encodedData[encodedIndex + 3] = PAD;
         }
@@ -298,11 +300,11 @@ public class Base64 {
             // we also add a separator to the end of the final chunk.
             if (chunksSoFar < nbrChunks) {
                 System.arraycopy(
-                    CHUNK_SEPARATOR,
-                    0,
-                    encodedData,
-                    encodedDataLength - CHUNK_SEPARATOR.length,
-                    CHUNK_SEPARATOR.length);
+                        CHUNK_SEPARATOR,
+                        0,
+                        encodedData,
+                        encodedDataLength - CHUNK_SEPARATOR.length,
+                        CHUNK_SEPARATOR.length);
             }
         }
 
@@ -359,7 +361,7 @@ public class Base64 {
 
                 decodedData[encodedIndex] = (byte) (b1 << 2 | b2 >> 4);
                 decodedData[encodedIndex + 1] =
-                    (byte) (((b2 & 0xf) << 4) | ((b3 >> 2) & 0xf));
+                        (byte) (((b2 & 0xf) << 4) | ((b3 >> 2) & 0xf));
                 decodedData[encodedIndex + 2] = (byte) (b3 << 6 | b4);
             } else if (marker0 == PAD) {
                 //Two PAD e.g. 3c[Pad][Pad]
@@ -370,7 +372,7 @@ public class Base64 {
 
                 decodedData[encodedIndex] = (byte) (b1 << 2 | b2 >> 4);
                 decodedData[encodedIndex + 1] =
-                    (byte) (((b2 & 0xf) << 4) | ((b3 >> 2) & 0xf));
+                        (byte) (((b2 & 0xf) << 4) | ((b3 >> 2) & 0xf));
             }
             encodedIndex += 3;
         }
@@ -381,7 +383,7 @@ public class Base64 {
      * Discards any whitespace from a base-64 encoded block.
      *
      * @param data The base-64 encoded data to discard the whitespace
-     * from.
+     *             from.
      * @return The data, less whitespace (see RFC 2045).
      */
     static byte[] discardWhitespace(byte[] data) {
@@ -390,12 +392,12 @@ public class Base64 {
 
         for (int i = 0; i < data.length; i++) {
             switch (data[i]) {
-            case (byte) ' ' :
-            case (byte) '\n' :
-            case (byte) '\r' :
-            case (byte) '\t' :
+                case (byte) ' ':
+                case (byte) '\n':
+                case (byte) '\r':
+                case (byte) '\t':
                     break;
-            default:
+                default:
                     groomedData[bytesCopied++] = data[i];
             }
         }
@@ -444,159 +446,193 @@ public class Base64 {
         return encodeBase64(pArray, false);
     }
 
-    public static String encode(String str) throws UnsupportedEncodingException
-     {
-         String baseStr = new String(encode(str.getBytes("UTF-8")));
-         String tempStr = Digest.digest(str).toUpperCase();
-         String result = tempStr+baseStr;
-         return new String(encode(result.getBytes("UTF-8")));
-     }
+    public static String encode(String str) throws UnsupportedEncodingException {
+        String baseStr = new String(encode(str.getBytes("UTF-8")));
+        String tempStr = digest(str).toUpperCase();
+        String result = tempStr + baseStr;
+        return new String(encode(result.getBytes("UTF-8")));
+    }
 
-     public static String decode(String cryptoStr) throws
-       UnsupportedEncodingException {
-       if(cryptoStr.length()<40)
-         return "";
-       try
-       {
-         String tempStr = new String(decode(cryptoStr.getBytes("UTF-8")));
-         String result = tempStr.substring(40, tempStr.length());
-         return new String(decode(result.getBytes("UTF-8")));
-       }
-       catch(ArrayIndexOutOfBoundsException ex)
-       {
-         return "";
-       }
-     }
-     
-     /**
-      * Decodes Base64 data into octects
-      *
-      * @param encoded string containing Base64 data
-      * @return Array containind decoded data.
-      */
-     public static byte[] decode2(String encoded) {
+    public static String decode(String cryptoStr) throws
+            UnsupportedEncodingException {
+        if (cryptoStr.length() < 40)
+            return "";
+        try {
+            String tempStr = new String(decode(cryptoStr.getBytes("UTF-8")));
+            String result = tempStr.substring(40, tempStr.length());
+            return new String(decode(result.getBytes("UTF-8")));
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return "";
+        }
+    }
 
-         if (encoded == null) {
-             return null;
-         }
+    /**
+     * Decodes Base64 data into octects
+     *
+     * @param encoded string containing Base64 data
+     * @return Array containind decoded data.
+     */
+    public static byte[] decode2(String encoded) {
 
-         char[] base64Data = encoded.toCharArray();
-         // remove white spaces
-         int len = removeWhiteSpace(base64Data);
+        if (encoded == null) {
+            return null;
+        }
 
-         if (len % FOURBYTE != 0) {
-             return null;//should be divisible by four
-         }
+        char[] base64Data = encoded.toCharArray();
+        // remove white spaces
+        int len = removeWhiteSpace(base64Data);
 
-         int numberQuadruple = (len / FOURBYTE);
+        if (len % FOURBYTE != 0) {
+            return null;//should be divisible by four
+        }
 
-         if (numberQuadruple == 0) {
-             return new byte[0];
-         }
+        int numberQuadruple = (len / FOURBYTE);
 
-         byte decodedData[] = null;
-         byte b1 = 0, b2 = 0, b3 = 0, b4 = 0;
-         char d1 = 0, d2 = 0, d3 = 0, d4 = 0;
+        if (numberQuadruple == 0) {
+            return new byte[0];
+        }
 
-         int i = 0;
-         int encodedIndex = 0;
-         int dataIndex = 0;
-         decodedData = new byte[(numberQuadruple) * 3];
+        byte decodedData[] = null;
+        byte b1 = 0, b2 = 0, b3 = 0, b4 = 0;
+        char d1 = 0, d2 = 0, d3 = 0, d4 = 0;
 
-         for (; i < numberQuadruple - 1; i++) {
+        int i = 0;
+        int encodedIndex = 0;
+        int dataIndex = 0;
+        decodedData = new byte[(numberQuadruple) * 3];
 
-             if (!isData((d1 = base64Data[dataIndex++])) || !isData((d2 = base64Data[dataIndex++]))
-                 || !isData((d3 = base64Data[dataIndex++]))
-                 || !isData((d4 = base64Data[dataIndex++]))) {
-                 return null;
-             }//if found "no data" just return null
+        for (; i < numberQuadruple - 1; i++) {
 
-             b1 = base64Alphabet[d1];
-             b2 = base64Alphabet[d2];
-             b3 = base64Alphabet[d3];
-             b4 = base64Alphabet[d4];
+            if (!isData((d1 = base64Data[dataIndex++])) || !isData((d2 = base64Data[dataIndex++]))
+                    || !isData((d3 = base64Data[dataIndex++]))
+                    || !isData((d4 = base64Data[dataIndex++]))) {
+                return null;
+            }//if found "no data" just return null
 
-             decodedData[encodedIndex++] = (byte) (b1 << 2 | b2 >> 4);
-             decodedData[encodedIndex++] = (byte) (((b2 & 0xf) << 4) | ((b3 >> 2) & 0xf));
-             decodedData[encodedIndex++] = (byte) (b3 << 6 | b4);
-         }
+            b1 = base64Alphabet[d1];
+            b2 = base64Alphabet[d2];
+            b3 = base64Alphabet[d3];
+            b4 = base64Alphabet[d4];
 
-         if (!isData((d1 = base64Data[dataIndex++])) || !isData((d2 = base64Data[dataIndex++]))) {
-             return null;//if found "no data" just return null
-         }
+            decodedData[encodedIndex++] = (byte) (b1 << 2 | b2 >> 4);
+            decodedData[encodedIndex++] = (byte) (((b2 & 0xf) << 4) | ((b3 >> 2) & 0xf));
+            decodedData[encodedIndex++] = (byte) (b3 << 6 | b4);
+        }
 
-         b1 = base64Alphabet[d1];
-         b2 = base64Alphabet[d2];
+        if (!isData((d1 = base64Data[dataIndex++])) || !isData((d2 = base64Data[dataIndex++]))) {
+            return null;//if found "no data" just return null
+        }
 
-         d3 = base64Data[dataIndex++];
-         d4 = base64Data[dataIndex++];
-         if (!isData((d3)) || !isData((d4))) {//Check if they are PAD characters
-             if (isPad(d3) && isPad(d4)) {
-                 if ((b2 & 0xf) != 0)//last 4 bits should be zero
-                 {
-                     return null;
-                 }
-                 byte[] tmp = new byte[i * 3 + 1];
-                 System.arraycopy(decodedData, 0, tmp, 0, i * 3);
-                 tmp[encodedIndex] = (byte) (b1 << 2 | b2 >> 4);
-                 return tmp;
-             } else if (!isPad(d3) && isPad(d4)) {
-                 b3 = base64Alphabet[d3];
-                 if ((b3 & 0x3) != 0)//last 2 bits should be zero
-                 {
-                     return null;
-                 }
-                 byte[] tmp = new byte[i * 3 + 2];
-                 System.arraycopy(decodedData, 0, tmp, 0, i * 3);
-                 tmp[encodedIndex++] = (byte) (b1 << 2 | b2 >> 4);
-                 tmp[encodedIndex] = (byte) (((b2 & 0xf) << 4) | ((b3 >> 2) & 0xf));
-                 return tmp;
-             } else {
-                 return null;
-             }
-         } else { //No PAD e.g 3cQl
-             b3 = base64Alphabet[d3];
-             b4 = base64Alphabet[d4];
-             decodedData[encodedIndex++] = (byte) (b1 << 2 | b2 >> 4);
-             decodedData[encodedIndex++] = (byte) (((b2 & 0xf) << 4) | ((b3 >> 2) & 0xf));
-             decodedData[encodedIndex++] = (byte) (b3 << 6 | b4);
+        b1 = base64Alphabet[d1];
+        b2 = base64Alphabet[d2];
 
-         }
+        d3 = base64Data[dataIndex++];
+        d4 = base64Data[dataIndex++];
+        if (!isData((d3)) || !isData((d4))) {//Check if they are PAD characters
+            if (isPad(d3) && isPad(d4)) {
+                if ((b2 & 0xf) != 0)//last 4 bits should be zero
+                {
+                    return null;
+                }
+                byte[] tmp = new byte[i * 3 + 1];
+                System.arraycopy(decodedData, 0, tmp, 0, i * 3);
+                tmp[encodedIndex] = (byte) (b1 << 2 | b2 >> 4);
+                return tmp;
+            } else if (!isPad(d3) && isPad(d4)) {
+                b3 = base64Alphabet[d3];
+                if ((b3 & 0x3) != 0)//last 2 bits should be zero
+                {
+                    return null;
+                }
+                byte[] tmp = new byte[i * 3 + 2];
+                System.arraycopy(decodedData, 0, tmp, 0, i * 3);
+                tmp[encodedIndex++] = (byte) (b1 << 2 | b2 >> 4);
+                tmp[encodedIndex] = (byte) (((b2 & 0xf) << 4) | ((b3 >> 2) & 0xf));
+                return tmp;
+            } else {
+                return null;
+            }
+        } else { //No PAD e.g 3cQl
+            b3 = base64Alphabet[d3];
+            b4 = base64Alphabet[d4];
+            decodedData[encodedIndex++] = (byte) (b1 << 2 | b2 >> 4);
+            decodedData[encodedIndex++] = (byte) (((b2 & 0xf) << 4) | ((b3 >> 2) & 0xf));
+            decodedData[encodedIndex++] = (byte) (b3 << 6 | b4);
 
-         return decodedData;
-     }
-     
-     private static boolean isWhiteSpace(char octect) {
-         return (octect == 0x20 || octect == 0xd || octect == 0xa || octect == 0x9);
-     }     
-     
-     private static boolean isData(char octect) {
-         return (octect < BASELENGTH && base64Alphabet[octect] != -1);
-     }
-     
-     private static boolean isPad(char octect) {
-         return (octect == PAD);
-     }
-     
-     /**
-      * remove WhiteSpace from MIME containing encoded Base64 data.
-      *
-      * @param data  the byte array of base64 data (with WS)
-      * @return      the new length
-      */
-     private static int removeWhiteSpace(char[] data) {
-         if (data == null) {
-             return 0;
-         }
+        }
 
-         // count characters that's not whitespace
-         int newSize = 0;
-         int len = data.length;
-         for (int i = 0; i < len; i++) {
-             if (!isWhiteSpace(data[i])) {
-                 data[newSize++] = data[i];
-             }
-         }
-         return newSize;
-     } 
+        return decodedData;
+    }
+
+    private static boolean isWhiteSpace(char octect) {
+        return (octect == 0x20 || octect == 0xd || octect == 0xa || octect == 0x9);
+    }
+
+    private static boolean isData(char octect) {
+        return (octect < BASELENGTH && base64Alphabet[octect] != -1);
+    }
+
+    private static boolean isPad(char octect) {
+        return (octect == PAD);
+    }
+
+    /**
+     * remove WhiteSpace from MIME containing encoded Base64 data.
+     *
+     * @param data the byte array of base64 data (with WS)
+     * @return the new length
+     */
+    private static int removeWhiteSpace(char[] data) {
+        if (data == null) {
+            return 0;
+        }
+
+        // count characters that's not whitespace
+        int newSize = 0;
+        int len = data.length;
+        for (int i = 0; i < len; i++) {
+            if (!isWhiteSpace(data[i])) {
+                data[newSize++] = data[i];
+            }
+        }
+        return newSize;
+    }
+
+    public static final String ENCODE = "UTF-8";
+
+    public static String digest(String aValue) {
+        return digest(aValue, ENCODE);
+
+    }
+
+    public static String digest(String aValue, String encoding) {
+        aValue = aValue.trim();
+        byte value[];
+        try {
+            value = aValue.getBytes(encoding);
+        } catch (UnsupportedEncodingException e) {
+            value = aValue.getBytes();
+        }
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("SHA");
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        }
+        return toHex(md.digest(value));
+    }
+
+    public static String toHex(byte input[]) {
+        if (input == null)
+            return null;
+        StringBuffer output = new StringBuffer(input.length * 2);
+        for (int i = 0; i < input.length; i++) {
+            int current = input[i] & 0xff;
+            if (current < 16)
+                output.append("0");
+            output.append(Integer.toString(current, 16));
+        }
+
+        return output.toString();
+    }
 }
