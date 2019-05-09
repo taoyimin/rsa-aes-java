@@ -16,7 +16,7 @@ public class Main {
         System.out.println("经过aes加密后的数据:\n" + encryptText);
 
         //使用客户端私钥对aes密钥签名
-        String signature = RSACipher.sign(aesKey, Config.CLIENT_PRIVATE_KEY);
+        String signature = RSACipher.sign(Config.CLIENT_PRIVATE_KEY, aesKey);
         System.out.println("签名:\n" + signature);
 
         //使用服务端公钥加密aes密钥
@@ -33,7 +33,7 @@ public class Main {
         System.out.println("解密后的aes密钥:\n" + new String(aesKey1));
 
         //使用客户端公钥验签
-        Boolean result = RSACipher.checkSign(aesKey1, signature, Config.CLIENT_PUBLIC_KEY);
+        Boolean result = RSACipher.checkSign(Config.CLIENT_PUBLIC_KEY, aesKey1, signature);
         System.out.println("验签结果:\n" + result);
 
         //使用aes私钥解密密文
